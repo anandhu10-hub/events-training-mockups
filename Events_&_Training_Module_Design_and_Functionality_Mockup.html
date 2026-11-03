@@ -1,0 +1,309 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events &amp; Training Module: Design and Functionality Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Inter',system-ui,sans-serif;color:#1F2937;background:#F3F5FA}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit}
+a{color:#2457D6}
+h1,h2,h3{margin:0}
+.btn{border:0;border-radius:10px;padding:0 20px;height:44px;font-size:15px;font-weight:600;background:#2457D6;color:#fff}
+.btn:hover{background:#1B43A8}
+.btn:disabled{background:#B8C2D9;cursor:not-allowed}
+.btn2{border:1.5px solid #2457D6;border-radius:10px;padding:0 20px;height:44px;font-size:15px;font-weight:600;background:#fff;color:#2457D6}
+.btn2:hover{background:#EEF3FF}
+.ghost{border:0;background:transparent;color:#2457D6;font-weight:600;font-size:14px;min-height:44px;padding:0 8px}
+.card{background:#fff;border:1px solid #E3E8F2;border-radius:16px}
+.tcard{background:#fff;border:1px solid #E3E8F2;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;text-align:left;padding:0;color:inherit}
+.tcard:hover{box-shadow:0 8px 24px rgba(36,87,214,.14);border-color:#B9CBF5}
+.navlink{color:#374151;font-weight:500;font-size:15px;text-decoration:none;padding:12px 4px}
+.navlink:hover{color:#2457D6}
+.row:hover{background:#F8FAFF}
+.wrap{max-width:1280px;margin:0 auto;width:100%;padding:28px 24px 64px;display:flex;flex-direction:column;gap:20px}
+.pill{background:#EEF3FF;color:#1B43A8;font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px}
+.tile{background:#12306B;color:#fff;border-radius:12px;padding:12px 0}
+.tile b{display:block;font-size:24px;font-weight:800}
+.tile span{font-size:11px;color:#C7D6FA}
+.sbox{background:#F6F8FD;border-radius:12px;padding:14px 16px;font-size:14px}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid #9DB8F7;outline-offset:1px}
+.cols{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.main-col{flex:999 1 620px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.side-col{flex:1 1 320px;min-width:0;max-width:380px;display:flex;flex-direction:column;gap:20px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.side-col{max-width:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function () {
+  var S = {
+    screen: 'hub', role: 'participant', filter: 'All', tab: 'overview',
+    registered: false, submitted: false, showSubmit: false, submitDone: false,
+    link: '', fileName: '', agree: false, extDays: 0, chatOpen: false, chatText: '',
+    done: { 0: true, 1: true },
+    status: ['Shortlisted', 'Under review', 'Under review', 'Not submitted', 'Under review'],
+    messages: [
+      { mine: false, text: 'Welcome! Ask us anything about the training or the capstone.', meta: 'Organizer, 10:02' },
+      { mine: true, text: 'Is the final submission a team project or individual?', meta: 'You, 10:05' },
+      { mine: false, text: 'Individual. You can share a GitHub link or upload a ZIP.', meta: 'Organizer, 10:11' }
+    ]
+  };
+
+  var FILTERS = ['All', 'Training', 'Hackathon', 'Workshop', 'Webinar'];
+  var GRADS = ['linear-gradient(135deg,#12306B,#2457D6)', 'linear-gradient(135deg,#5B2A86,#8E4DD6)', 'linear-gradient(135deg,#0B5D5E,#1E9E8F)', 'linear-gradient(135deg,#8A3B12,#D9772B)', 'linear-gradient(135deg,#1F3A5F,#4B79B8)', 'linear-gradient(135deg,#7A1F4B,#C2457F)'];
+  var CARDS = [
+    { type: 'Training', short: 'Full Stack', title: 'Full Stack Web Development Bootcamp', org: 'Northwind Academy', mode: 'Online', dur: '6 weeks', fee: 'Free', dl: 'DYN' },
+    { type: 'Training', short: 'Data Analytics', title: 'Data Analytics with Python and SQL', org: 'Lakeshore Institute', mode: 'Hybrid', dur: '4 weeks', fee: 'Rs 999', dl: 'Registration closes in 12 days' },
+    { type: 'Hackathon', short: 'Build 48', title: 'Build48: Campus Innovation Hackathon', org: 'Orbit Labs', mode: 'Offline', dur: '48 hours', fee: 'Free', dl: 'Registration closes in 9 days' },
+    { type: 'Workshop', short: 'Cyber 101', title: 'Cybersecurity and Ethical Hacking Workshop', org: 'SecureNet Forum', mode: 'Online', dur: '2 days', fee: 'Free', dl: 'Registration closes in 5 days' },
+    { type: 'Webinar', short: 'Career Talk', title: 'Cracking Campus Placements: Expert Session', org: 'Careers Collective', mode: 'Online', dur: '90 mins', fee: 'Free', dl: 'Starts in 3 days' },
+    { type: 'Training', short: 'Cloud', title: 'Cloud Fundamentals and DevOps Essentials', org: 'Northwind Academy', mode: 'Online', dur: '5 weeks', fee: 'Rs 1,499', dl: 'Registration closes in 15 days' }
+  ];
+  var MODS = [
+    ['HTML, CSS and layout fundamentals', 'Week 1 · 6 lessons · 3 hrs'],
+    ['JavaScript essentials', 'Week 2 · 8 lessons · 4 hrs'],
+    ['Java back-end and REST APIs', 'Week 3 · 7 lessons · 5 hrs'],
+    ['MySQL and data modelling', 'Week 4 · 5 lessons · 3 hrs'],
+    ['Capstone project', 'Weeks 5-6 · Mentor reviewed']
+  ];
+  var PEOPLE = [
+    ['Aarav Menon', 'College of Engineering, Trivandrum', 'Link submitted'],
+    ['Diya Nair', 'Government Engineering College', 'ZIP uploaded'],
+    ['Rohan Pillai', 'Institute of Technology', 'Link submitted'],
+    ['Meera Iyer', 'Engineering College, Kollam', 'Not submitted'],
+    ['Kabir Shah', 'School of Computing', 'ZIP uploaded']
+  ];
+
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function cd() {
+    var end = new Date(2026, 10, 7 + S.extDays, 23, 59, 0).getTime();
+    var sec = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    return { d: pad(Math.floor(sec / 86400)), h: pad(Math.floor((sec % 86400) / 3600)), m: pad(Math.floor((sec % 3600) / 60)), s: pad(sec % 60) };
+  }
+  function dlDate() { return new Date(2026, 10, 7 + S.extDays).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  function c(k) { return '<span data-cd="' + k + '">' + cd()[k] + '</span>'; }
+
+  /* ---------- sections ---------- */
+  function nav() {
+    return '<header style="background:#fff;border-bottom:1px solid #E3E8F2"><div style="max-width:1280px;margin:0 auto;padding:8px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 28px">' +
+      '<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:10px;background:#2457D6;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px">Y</div><span style="font-weight:800;font-size:20px;color:#12306B">YourBrand</span></div>' +
+      '<nav style="display:flex;flex-wrap:wrap;gap:4px 24px;align-items:center;flex:1"><a class="navlink" href="#">Jobs</a><a class="navlink" href="#">Internships</a><a class="navlink" href="#" style="color:#2457D6;font-weight:700;border-bottom:3px solid #2457D6">Events &amp; Training</a><a class="navlink" href="#">Competitions</a><a class="navlink" href="#">Mentorships</a><a class="navlink" href="#">Practice</a></nav>' +
+      '<div style="display:flex;align-items:center;gap:12px"><button class="btn2" data-a="role">' + (S.role === 'participant' ? 'Switch to Organizer (EMS)' : 'Switch to Participant view') + '</button>' +
+      '<button aria-label="Open chat" data-a="openChat" style="width:44px;height:44px;border-radius:50%;border:1px solid #E3E8F2;background:#fff;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#12306B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg></button>' +
+      '<div style="width:40px;height:40px;border-radius:50%;background:#12306B;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px" aria-label="Profile">YO</div></div></div></header>';
+  }
+
+  function hub() {
+    var chips = FILTERS.map(function (f) {
+      var on = S.filter === f;
+      return '<button data-a="filter" data-i="' + f + '" style="' + (on ? 'border:0;background:#12306B;color:#fff' : 'border:1.5px solid #CBD5E8;background:#fff;color:#374151') + ';font-weight:600;font-size:14px;border-radius:999px;padding:0 20px;min-height:44px">' + f + '</button>';
+    }).join('');
+    var cards = CARDS.map(function (x, i) { return { x: x, i: i }; }).filter(function (o) { return S.filter === 'All' || o.x.type === S.filter; }).map(function (o) {
+      var x = o.x;
+      return '<button class="tcard" data-a="open" style="cursor:pointer"><div style="background:' + GRADS[o.i % 6] + ';min-height:120px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start">' +
+        '<span style="background:rgba(255,255,255,.92);color:#12306B;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">' + x.type + '</span><span style="font-size:34px;font-weight:800;color:#fff;line-height:1.1">' + x.short + '</span></div>' +
+        '<div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1"><div style="font-weight:700;font-size:17px;line-height:1.3;color:#111827">' + x.title + '</div><div style="font-size:14px;color:#5B6475">' + x.org + '</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px"><span class="pill">' + x.mode + '</span><span class="pill">' + x.dur + '</span><span class="pill" style="background:#E3F6EC;color:#0F6B45">' + x.fee + '</span></div>' +
+        '<div style="margin-top:auto;padding-top:10px;border-top:1px solid #EDF0F7;font-size:13px;color:#B45309;font-weight:600">' + (x.dl === 'DYN' ? 'Registration closes in ' + parseInt(cd().d, 10) + ' days' : x.dl) + '</div></div></button>';
+    }).join('');
+    return '<main class="wrap" style="padding-top:32px">' +
+      '<section style="background:linear-gradient(120deg,#12306B 0%,#2457D6 100%);border-radius:20px;padding:36px 40px;display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between"><div style="max-width:560px;display:flex;flex-direction:column;gap:10px"><h1 style="font-size:34px;line-height:1.2;color:#fff;font-weight:800">Events &amp; Training</h1><p style="margin:0;color:#DCE6FF;font-size:16px;line-height:1.5">Upskill with trainings, workshops and hackathons. Register, learn, submit and get placed.</p></div>' +
+      '<div style="display:flex;gap:8px;background:#fff;border-radius:12px;padding:6px;flex:1 1 340px;max-width:520px"><label for="q" style="position:absolute;left:-9999px">Search trainings</label><input id="q" placeholder="Search trainings, events, skills" style="flex:1;border:0;font-size:15px;padding:0 12px;min-height:44px;background:transparent;min-width:0"><button class="btn">Search</button></div></section>' +
+      '<section style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">' + chips + '</section>' +
+      '<section style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px">' + cards + '</section></main>';
+  }
+
+  function tabBtn(id, label) {
+    var on = S.tab === id;
+    return '<button role="tab" data-a="tab" data-i="' + id + '" style="border:0;background:transparent;font-size:15px;font-weight:' + (on ? 700 : 600) + ';color:' + (on ? '#2457D6' : '#5B6475') + ';padding:0 16px;min-height:48px;border-bottom:3px solid ' + (on ? '#2457D6' : 'transparent') + '">' + label + '</button>';
+  }
+
+  function overview() {
+    var learn = ['HTML, CSS and responsive layouts', 'JavaScript and modern tooling', 'Java back-end services and REST APIs', 'MySQL and data modelling'].map(function (t) { return '<div class="sbox" style="color:#1F2937">' + t + '</div>'; }).join('');
+    return '<section class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h2 style="font-size:20px;color:#111827">About the training</h2>' +
+      '<p style="margin:0;line-height:1.65;color:#374151;font-size:15px">A hands-on programme covering front-end, back-end and databases, ending with a capstone project that is reviewed by industry mentors. Top performers are shortlisted for the linked job role listed in the Job Description tab.</p>' +
+      '<h3 style="margin-top:8px;font-size:17px;color:#111827">What you will learn</h3><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">' + learn + '</div>' +
+      '<h3 style="margin-top:8px;font-size:17px;color:#111827">Key dates</h3><div style="display:flex;flex-direction:column;gap:10px;font-size:14px;color:#374151">' +
+      '<div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF0F7"><span>Registration closes</span><b>' + dlDate() + '</b></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF0F7"><span>Training starts</span><b>10 Nov 2026</b></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:12px"><span>Final submission</span><b>22 Dec 2026</b></div></div></section>';
+  }
+
+  function jd() {
+    function li(a) { return '<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;color:#374151;font-size:15px;line-height:1.55">' + a.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>'; }
+    function step(t) { return '<span style="background:#F6F8FD;border-radius:10px;padding:10px 14px">' + t + '</span>'; }
+    return '<section class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px">' +
+      '<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><div><h2 style="font-size:20px;color:#111827">Associate Software Engineer (Trainee)</h2><div style="font-size:14px;color:#5B6475;margin-top:4px">Linked role &middot; Hiring partner: [Company Name]</div></div><span style="background:#FEF3C7;color:#92400E;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px">Pre-placement offer</span></div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:10px"><span class="pill" style="font-size:13px;padding:6px 12px">Full-time</span><span class="pill" style="font-size:13px;padding:6px 12px">[Location]</span><span class="pill" style="font-size:13px;padding:6px 12px">CTC: [Add CTC]</span></div>' +
+      '<h3 style="margin-top:8px;font-size:17px;color:#111827">Responsibilities</h3>' + li(['Build and maintain web features across the front end and back end', 'Write clean, tested code and take part in code reviews', 'Work with mentors to scope, estimate and deliver tasks', 'Document APIs and database changes']) +
+      '<h3 style="margin-top:8px;font-size:17px;color:#111827">Requirements</h3>' + li(['Working knowledge of Java or Python, plus JavaScript', 'Understanding of SQL databases and Git', 'Completion of this training with a passing capstone score']) +
+      '<h3 style="margin-top:8px;font-size:17px;color:#111827">Selection process</h3><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:14px;color:#1F2937">' + step('1. Training') + '&rarr;' + step('2. Capstone submission') + '&rarr;' + step('3. Interview') + '&rarr;' + step('4. Offer') + '</div></section>';
+  }
+
+  function doneCount() { return S.registered ? MODS.filter(function (m, i) { return S.done[i]; }).length : 0; }
+
+  function modules() {
+    var dc = doneCount();
+    var rows = MODS.map(function (m, i) {
+      var d = !!S.done[i] && S.registered;
+      return '<div class="row" style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;border:1px solid #E3E8F2;border-radius:14px;padding:14px 16px">' +
+        '<div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;' + (d ? 'background:#E3F6EC;color:#0F6B45' : 'background:#EEF3FF;color:#1B43A8') + '">' + (i + 1) + '</div>' +
+        '<div style="flex:1 1 240px"><div style="font-weight:600;font-size:15px;color:#111827">' + m[0] + '</div><div style="font-size:13px;color:#5B6475;margin-top:2px">' + m[1] + '</div></div>' +
+        '<button data-a="mod" data-i="' + i + '" style="font-weight:600;font-size:14px;border-radius:10px;padding:0 16px;min-height:44px;' + (d ? 'border:0;background:#E3F6EC;color:#0F6B45' : 'border:1.5px solid #CBD5E8;background:#fff;color:#374151') + '">' + (d ? 'Completed' : 'Mark complete') + '</button></div>';
+    }).join('');
+    return '<section class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px"><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><h2 style="font-size:20px;color:#111827">Training modules</h2><span style="font-size:14px;color:#374151;font-weight:600">' + dc + ' of ' + MODS.length + ' completed</span></div>' +
+      '<div style="height:10px;border-radius:999px;background:#E3E8F2;overflow:hidden" role="progressbar" aria-label="Training progress"><div style="height:100%;background:#2457D6;border-radius:999px;width:' + Math.round(dc / MODS.length * 100) + '%"></div></div>' +
+      (S.registered ? '' : '<div style="background:#FEF3C7;color:#78350F;border-radius:12px;padding:12px 16px;font-size:14px">Register for this training to track your progress.</div>') +
+      '<div style="display:flex;flex-direction:column;gap:12px">' + rows + '</div></section>';
+  }
+
+  function sidebar() {
+    var action;
+    if (!S.registered) action = '<button class="btn" data-a="register" style="width:100%">Register for free</button>';
+    else action = '<div style="background:#E3F6EC;color:#0F6B45;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:600">You are registered</div>' +
+      (S.submitted ? '<div style="border:1px solid #BFE6D2;background:#F3FBF7;border-radius:12px;padding:12px 14px;font-size:14px;color:#0F6B45"><b>Assignment submitted.</b> Status: Under review</div>' : '<button class="btn" data-a="openSubmit" style="width:100%">Submit assignment</button>');
+    return '<aside class="side-col"><section class="card" style="padding:24px;display:flex;flex-direction:column;gap:16px"><div style="font-weight:700;font-size:16px;color:#111827">Registration closes in</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center"><div class="tile"><b>' + c('d') + '</b><span>DAYS</span></div><div class="tile"><b>' + c('h') + '</b><span>HRS</span></div><div class="tile"><b>' + c('m') + '</b><span>MIN</span></div><div class="tile"><b>' + c('s') + '</b><span>SEC</span></div></div>' +
+      '<div style="font-size:13px;color:#5B6475">Deadline: <b style="color:#111827">' + dlDate() + ', 11:59 PM IST</b></div>' + action + '</section>' +
+      '<section class="card" style="padding:24px;display:flex;flex-direction:column;gap:12px"><div style="font-weight:700;font-size:16px;color:#111827">Need help?</div><div style="font-size:14px;color:#5B6475;line-height:1.5">Ask the organizer or a mentor. Replies usually arrive within a few hours.</div><button class="btn2" data-a="openChat" style="width:100%">Chat with organizer</button></section>' +
+      '<section class="card" style="padding:24px;display:flex;flex-direction:column;gap:10px"><div style="font-weight:700;font-size:16px;color:#111827">Organizer</div><div style="display:flex;gap:12px;align-items:center"><div style="width:44px;height:44px;border-radius:12px;background:#EEF3FF;color:#1B43A8;font-weight:800;display:flex;align-items:center;justify-content:center">NA</div><div><div style="font-weight:600;font-size:15px">Northwind Academy</div><div style="font-size:13px;color:#5B6475">Verified organizer</div></div></div></section></aside>';
+  }
+
+  function detail() {
+    var body = S.tab === 'overview' ? overview() : S.tab === 'jd' ? jd() : modules();
+    return '<main class="wrap" style="padding-top:24px"><button class="ghost" data-a="hub" style="align-self:flex-start">&larr; Back to Events &amp; Training</button>' +
+      '<section class="card" style="overflow:hidden"><div style="background:linear-gradient(120deg,#12306B 0%,#2457D6 100%);padding:28px 32px;display:flex;flex-wrap:wrap;gap:20px;align-items:center"><div style="width:88px;height:88px;border-radius:18px;background:#fff;color:#12306B;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800">FS</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;flex:1 1 320px"><span style="align-self:flex-start;background:rgba(255,255,255,.18);color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px">Training</span><h1 style="color:#fff;font-size:28px;line-height:1.25;font-weight:800">Full Stack Web Development Bootcamp</h1><div style="color:#DCE6FF;font-size:15px">Northwind Academy &middot; Online &middot; 6 weeks</div></div></div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:12px 32px;padding:16px 32px;border-bottom:1px solid #E3E8F2;font-size:14px;color:#374151"><span><b style="color:#111827">Mode:</b> Online, live + recorded</span><span><b style="color:#111827">Eligibility:</b> Final-year B.Tech / BCA / MCA</span><span><b style="color:#111827">Fee:</b> Free</span><span><b style="color:#111827">Certificate:</b> On completion</span></div>' +
+      '<div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;padding:0 24px">' + tabBtn('overview', 'Overview') + tabBtn('jd', 'Job Description') + tabBtn('modules', 'Training Modules') + '</div></section>' +
+      '<div class="cols"><div class="main-col">' + body + '</div>' + sidebar() + '</div></main>';
+  }
+
+  function chip(st) {
+    var m = { Shortlisted: ['#E3F6EC', '#0F6B45'], Rejected: ['#FDE8E6', '#B42318'], 'Under review': ['#FEF3C7', '#92400E'], 'Not submitted': ['#EDF0F7', '#374151'] }[st];
+    return '<span style="background:' + m[0] + ';color:' + m[1] + ';font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">' + st + '</span>';
+  }
+
+  function ems() {
+    var short = S.status.filter(function (x) { return x === 'Shortlisted'; }).length;
+    var rows = PEOPLE.map(function (p, i) {
+      return '<tr class="row" style="border-top:1px solid #EDF0F7"><td style="padding:14px 24px;font-weight:600;color:#111827">' + p[0] + '</td><td style="padding:14px 12px;color:#374151">' + p[1] + '</td><td style="padding:14px 12px;color:#374151">' + p[2] + '</td><td style="padding:14px 12px">' + chip(S.status[i]) + '</td>' +
+        '<td style="padding:8px 24px;text-align:right;white-space:nowrap"><button class="ghost" data-a="short" data-i="' + i + '">Shortlist</button><button class="ghost" data-a="rej" data-i="' + i + '" style="color:#B42318">Reject</button></td></tr>';
+    }).join('');
+    function stat(l, v, col, extra) { return '<div class="card" style="padding:20px"><div style="font-size:13px;color:#5B6475;font-weight:600">' + l + '</div><div style="font-size:30px;font-weight:800;color:' + col + ';margin-top:6px">' + v + '</div>' + (extra || '') + '</div>'; }
+    return '<main class="wrap"><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><div><div style="font-size:13px;color:#5B6475;font-weight:600">Event Management System</div><h1 style="margin-top:4px;font-size:28px;color:#12306B;font-weight:800">Full Stack Web Development Bootcamp</h1></div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn2" data-a="extend">Extend deadline by 1 day</button><button class="btn" data-a="openChat">Open participant chat</button></div></div>' +
+      '<section class="stats">' + stat('Registrations', 5 + (S.registered ? 1 : 0), '#12306B') + stat('Submissions', 4 + (S.submitted ? 1 : 0), '#12306B') + stat('Shortlisted', short, '#0F6B45') + stat('Closes in', c('d') + 'd ' + c('h') + 'h', '#B45309', '<div style="font-size:12px;color:#5B6475;margin-top:2px">' + dlDate() + '</div>') + '</section>' +
+      '<section class="card" style="overflow:hidden"><div style="padding:18px 24px;border-bottom:1px solid #E3E8F2;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:center"><h2 style="font-size:18px;color:#111827">Participants</h2><span style="font-size:13px;color:#5B6475">Shortlist or reject after reviewing submissions</span></div>' +
+      '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:760px;font-size:14px"><thead><tr style="background:#F6F8FD;text-align:left;color:#374151"><th style="padding:12px 24px;font-weight:600">Name</th><th style="padding:12px;font-weight:600">College</th><th style="padding:12px;font-weight:600">Submission</th><th style="padding:12px;font-weight:600">Status</th><th style="padding:12px 24px;font-weight:600;text-align:right">Action</th></tr></thead><tbody>' + rows + '</tbody></table></div></section></main>';
+  }
+
+  function modal() {
+    if (!S.showSubmit) return '';
+    var inner;
+    if (S.submitDone) {
+      inner = '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:12px 0"><div style="width:64px;height:64px;border-radius:50%;background:#E3F6EC;display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0F6B45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></div><h2 style="font-size:22px;color:#111827">Submission received</h2><p style="margin:0;color:#5B6475;font-size:15px;line-height:1.5">The organizer will review your work and update your status here. You can resubmit until the deadline.</p><button class="btn" data-a="closeSubmit">Done</button></div>';
+    } else {
+      var ok = ((S.link || '').trim().length > 0 || !!S.fileName) && S.agree;
+      inner = '<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="font-size:22px;color:#111827">Submit assignment</h2><button class="ghost" data-a="closeSubmit" aria-label="Close">Close</button></div>' +
+        '<div style="background:#FEF3C7;color:#78350F;border-radius:12px;padding:10px 14px;font-size:13px">Submission closes ' + dlDate() + ', 11:59 PM IST. Time left: <b>' + c('d') + 'd ' + c('h') + 'h ' + c('m') + 'm</b></div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px"><label for="repo" style="font-size:14px;font-weight:600">Project link (GitHub / Drive)</label><input id="repo" value="' + esc(S.link) + '" placeholder="https://github.com/username/project" style="border:1.5px solid #CBD5E8;border-radius:10px;padding:0 14px;min-height:44px;font-size:15px"></div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:600">Upload file (optional)</div><div style="border:1.5px dashed #9DB8F7;border-radius:12px;padding:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:#F6F9FF"><span style="font-size:14px;color:#374151">' + (S.fileName || 'No file chosen') + '</span><button class="btn2" data-a="pickFile" style="height:40px">Choose file</button></div><div style="font-size:12px;color:#5B6475">PDF, ZIP or DOCX up to 25 MB</div></div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px"><label for="note" style="font-size:14px;font-weight:600">Note to reviewer (optional)</label><textarea id="note" rows="3" placeholder="Anything the reviewer should know" style="border:1.5px solid #CBD5E8;border-radius:10px;padding:10px 14px;font-size:15px;resize:vertical"></textarea></div>' +
+        '<label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:#374151;line-height:1.5;min-height:44px"><input id="agree" type="checkbox"' + (S.agree ? ' checked' : '') + ' style="width:20px;height:20px;margin-top:2px"><span>I confirm this is my own work and I accept the submission guidelines.</span></label>' +
+        '<div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap"><button class="btn2" data-a="closeSubmit">Cancel</button><button id="submitBtn" class="btn" data-a="doSubmit"' + (ok ? '' : ' disabled') + '>Submit</button></div>';
+    }
+    return '<div style="position:fixed;inset:0;background:rgba(17,24,39,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50"><div role="dialog" aria-label="Submit assignment" style="background:#fff;border-radius:20px;width:100%;max-width:520px;max-height:92vh;overflow:auto;padding:28px;display:flex;flex-direction:column;gap:16px">' + inner + '</div></div>';
+  }
+
+  function chat() {
+    if (!S.chatOpen) return '';
+    var msgs = S.messages.map(function (m) {
+      return '<div style="display:flex;flex-direction:column;max-width:82%;' + (m.mine ? 'align-self:flex-end;align-items:flex-end' : 'align-self:flex-start;align-items:flex-start') + '"><div style="font-size:14px;line-height:1.45;padding:10px 14px;border-radius:14px;' + (m.mine ? 'background:#2457D6;color:#fff' : 'background:#fff;color:#1F2937;border:1px solid #E3E8F2') + '">' + esc(m.text) + '</div><div style="font-size:11px;color:#5B6475;margin-top:3px">' + esc(m.meta) + '</div></div>';
+    }).join('');
+    return '<div role="dialog" aria-label="Chat" style="position:fixed;right:16px;bottom:16px;width:380px;max-width:calc(100vw - 32px);height:540px;max-height:calc(100vh - 32px);background:#fff;border:1px solid #E3E8F2;border-radius:18px;box-shadow:0 16px 48px rgba(17,24,39,.22);display:flex;flex-direction:column;overflow:hidden;z-index:60">' +
+      '<div style="background:#12306B;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:10px;background:#fff;color:#12306B;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px">NA</div><div><div style="font-weight:700;font-size:15px">Northwind Academy</div><div style="font-size:12px;color:#C7D6FA">Organizer &middot; usually replies in a few hours</div></div></div><button data-a="closeChat" aria-label="Close chat" style="background:transparent;border:0;color:#fff;font-size:15px;min-width:44px;min-height:44px">Close</button></div>' +
+      '<div id="msgs" style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#F6F8FD">' + msgs + '</div>' +
+      '<div style="padding:12px;border-top:1px solid #E3E8F2;display:flex;gap:8px;background:#fff"><label for="chatin" style="position:absolute;left:-9999px">Type a message</label><input id="chatin" value="' + esc(S.chatText) + '" placeholder="Type a message" style="flex:1;min-width:0;border:1.5px solid #CBD5E8;border-radius:10px;padding:0 12px;min-height:44px;font-size:15px"><button class="btn" data-a="send" style="padding:0 16px">Send</button></div></div>';
+  }
+
+  var app = document.getElementById('app');
+  function render() {
+    app.innerHTML = '<div style="min-height:100vh;display:flex;flex-direction:column">' + nav() + (S.screen === 'hub' ? hub() : S.screen === 'detail' ? detail() : ems()) + '</div>' + modal() + chat();
+    var m = document.getElementById('msgs'); if (m) m.scrollTop = m.scrollHeight;
+  }
+
+  function send() {
+    var inp = document.getElementById('chatin');
+    var t = ((inp ? inp.value : S.chatText) || '').trim();
+    if (!t) return;
+    S.messages.push({ mine: true, text: t, meta: (S.role === 'organizer' ? 'Organizer' : 'You') + ', now' });
+    S.chatText = '';
+    render();
+    var n = document.getElementById('chatin'); if (n) n.focus();
+  }
+
+  function act(a, i) {
+    switch (a) {
+      case 'role': if (S.role === 'participant') { S.role = 'organizer'; S.screen = 'ems'; } else { S.role = 'participant'; S.screen = 'hub'; } break;
+      case 'filter': S.filter = i; break;
+      case 'open': S.screen = 'detail'; S.tab = 'overview'; break;
+      case 'hub': S.screen = 'hub'; break;
+      case 'tab': S.tab = i; break;
+      case 'register': S.registered = true; break;
+      case 'mod': if (S.registered) S.done[i] = !S.done[i]; break;
+      case 'openSubmit': S.showSubmit = true; S.submitDone = false; break;
+      case 'closeSubmit': S.showSubmit = false; break;
+      case 'pickFile': S.fileName = 'capstone_project.zip'; break;
+      case 'doSubmit': S.submitted = true; S.submitDone = true; break;
+      case 'extend': S.extDays += 1; break;
+      case 'short': S.status[i] = 'Shortlisted'; break;
+      case 'rej': S.status[i] = 'Rejected'; break;
+      case 'openChat': S.chatOpen = true; break;
+      case 'closeChat': S.chatOpen = false; break;
+      case 'send': send(); return;
+    }
+    render();
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-a]'); if (!b || b.disabled) return;
+    act(b.getAttribute('data-a'), b.getAttribute('data-i'));
+  });
+  document.addEventListener('input', function (e) {
+    if (e.target.id === 'repo') { S.link = e.target.value; refreshSubmit(); }
+    if (e.target.id === 'chatin') { S.chatText = e.target.value; }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'agree') { S.agree = e.target.checked; refreshSubmit(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.id === 'chatin') { e.preventDefault(); send(); }
+  });
+  function refreshSubmit() {
+    var b = document.getElementById('submitBtn'); if (!b) return;
+    b.disabled = !((((S.link || '').trim().length > 0) || !!S.fileName) && S.agree);
+  }
+
+  setInterval(function () {
+    var v = cd();
+    var els = document.querySelectorAll('[data-cd]');
+    for (var k = 0; k < els.length; k++) els[k].textContent = v[els[k].getAttribute('data-cd')];
+  }, 1000);
+
+  render();
+})();
+</script>
+</body>
+</html>
+
+</body></html>
